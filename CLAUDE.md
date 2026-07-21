@@ -1,5 +1,5 @@
 # Mission
-Build the world's first affordable domestic AI recycling appliance. We aim to bring industrial grade waste sorting into the home environment using computer vision and accessible robotics.
+Build the first affordable domestic AI recycling appliance in the world. We aim to bring industrial grade waste sorting into the home environment using computer vision and accessible robotics.
 
 # Team Profile
 Two founders spearheading the project.
@@ -34,3 +34,4 @@ You are acting as the senior engineering partner. You must follow these exact st
 * If the system architecture changes, update docs/03_System_Architecture.md immediately.
 * If a new hardware piece is integrated, log it in docs/05_Hardware.md.
 * Ensure all code includes brief, mathematically precise comments where complex logic is applied.
+* Push everything into the smart bin github repository automatically after each new code change or integration is successfully completed.
