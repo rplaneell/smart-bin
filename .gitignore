@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Auto-downloaded model weights (re-fetched by ultralytics on first run)
+software/models/*.pt

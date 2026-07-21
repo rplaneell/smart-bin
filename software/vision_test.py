@@ -7,6 +7,7 @@ proves the load -> validate -> preprocess -> display path is sound before
 any model is wired in.
 """
 
+from io import BytesIO
 from pathlib import Path
 
 import cv2
@@ -43,30 +44,58 @@ def validate_image(path: Path) -> bool:
     return True
 
 
+def _pillow_fallback(data_source, name: str) -> np.ndarray | None:
+    """Decode via Pillow when cv2 can't (e.g. some WebP builds), converting
+    RGB -> BGR right away so every loader in this module returns the same
+    channel order.
+    """
+    try:
+        from PIL import Image, UnidentifiedImageError
+    except ImportError:
+        print(f"[ERROR] {name}: cv2 could not decode it and Pillow is unavailable for fallback")
+        return None
+
+    try:
+        with Image.open(data_source) as pil_image:
+            rgb = np.array(pil_image.convert("RGB"))
+    except (UnidentifiedImageError, OSError) as exc:
+        print(f"[ERROR] {name}: unreadable/corrupt image ({exc})")
+        return None
+
+    return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+
+
 def load_image(path: Path) -> np.ndarray | None:
-    """Decode an image to a BGR ndarray, with a Pillow fallback for
+    """Decode an image file to a BGR ndarray, with a Pillow fallback for
     formats/builds that cv2.imread can't handle (e.g. some WebP files).
     """
     image = cv2.imread(str(path), cv2.IMREAD_COLOR)
     if image is not None:
         return image
+    return _pillow_fallback(path, path.name)
 
-    try:
-        from PIL import Image, UnidentifiedImageError
-    except ImportError:
-        print(f"[ERROR] {path.name}: cv2 could not decode it and Pillow is unavailable for fallback")
+
+def load_image_from_bytes(data: bytes, name: str = "<upload>") -> np.ndarray | None:
+    """Decode raw image bytes (e.g. a Streamlit file-upload buffer) to a BGR
+    ndarray. Mirrors load_image() so callers that receive in-memory uploads
+    don't need to write a temp file just to reuse the same pipeline.
+    """
+    if not data:
+        print(f"[ERROR] {name}: empty upload")
         return None
 
-    try:
-        with Image.open(path) as pil_image:
-            rgb = np.array(pil_image.convert("RGB"))
-    except (UnidentifiedImageError, OSError) as exc:
-        print(f"[ERROR] {path.name}: unreadable/corrupt image ({exc})")
-        return None
+    buffer = np.frombuffer(data, dtype=np.uint8)
+    image = cv2.imdecode(buffer, cv2.IMREAD_COLOR)
+    if image is not None:
+        return image
+    return _pillow_fallback(BytesIO(data), name)
 
-    # Pillow decodes to RGB; the rest of this pipeline standardizes on cv2's
-    # native BGR channel order, so the swap must happen right at load time.
-    return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+
+def bgr_to_rgb(image_bgr: np.ndarray) -> np.ndarray:
+    """Convert an OpenCV-native BGR image to RGB, for display libraries
+    (Streamlit, PIL, matplotlib) that expect RGB channel order.
+    """
+    return cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
 
 def _select_interpolation(src_w: int, src_h: int, dst_w: int, dst_h: int) -> int:

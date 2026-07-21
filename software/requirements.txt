@@ -1,3 +1,10 @@
 opencv-python>=4.8
 numpy>=1.21
 Pillow>=10.0
+ultralytics>=8.4
+streamlit>=1.59
+
+# ultralytics pulls in torch/torchvision automatically. On CPU-only dev
+# machines, install those first from the CPU wheel index to skip the
+# multi-GB CUDA toolkit download:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
