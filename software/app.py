@@ -116,10 +116,10 @@ def main() -> None:
     img_col1, img_col2, img_col3 = st.columns(3)
     with img_col1:
         st.caption("Original")
-        st.image(bgr_to_rgb(original_bgr), use_container_width=True)
+        st.image(bgr_to_rgb(original_bgr), width='stretch')
     with img_col2:
         st.caption("Detection Overlay")
-        st.image(bgr_to_rgb(annotated_bgr), use_container_width=True)
+        st.image(bgr_to_rgb(annotated_bgr), width='stretch')
     with img_col3:
         st.caption("Cropped Object Preview")
         crop_choices = [r for r in results if r.crop is not None]
@@ -127,7 +127,7 @@ def main() -> None:
             labels = [f"{i + 1}. {r.label}" for i, r in enumerate(crop_choices)]
             selected = st.selectbox("Object", labels, key="crop_select")
             idx = labels.index(selected)
-            st.image(bgr_to_rgb(crop_choices[idx].crop), use_container_width=True)
+            st.image(bgr_to_rgb(crop_choices[idx].crop), width='stretch')
         else:
             st.write("No object crop available.")
 
