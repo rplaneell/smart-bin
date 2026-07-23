@@ -219,3 +219,8 @@ __marimo__/
 
 # Auto-downloaded model weights (re-fetched by ultralytics on first run)
 software/models/*.pt
+
+# Raw dataset photos: kept locally, tracked in git only as datasets/raw.zip
+datasets/raw/*.jpg
+datasets/raw/*.jpeg
+datasets/raw/*.png

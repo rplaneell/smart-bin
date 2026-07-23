@@ -17,6 +17,11 @@ photos or labels.
 * Photos are moved (not copied) into `datasets/raw/` flat, preserving
   original filenames exactly. A subfolder (e.g. `datasets/raw/session1/`)
   is fine too if that keeps a batch tidier — either layout is allowed.
+* Individual raw photos stay local-only (`datasets/raw/*.jpg` is
+  gitignored) — git tracks the whole set as a single `datasets/raw.zip`
+  instead. When new photos are added to `datasets/raw/`, re-zip it
+  (`zip -r datasets/raw.zip datasets/raw`) before committing, so the
+  archive stays in sync with what's on disk.
 
 ## Batching
 * Process photos in batches of 15-30, never all at once.
